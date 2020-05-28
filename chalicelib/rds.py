@@ -47,42 +47,42 @@ def query_handler(query, variables=()):
 
 
 def register_new_user(email, password, real_name='', birthday='', phone_number='', is_parent='0'):
-    result = query_handler("""INSERT INTO fs__users (email, password, real_name, birthday, phone_number, is_parent) values("%s", "%s", "%s", "%s", "%s", %s)""",
+    result = query_handler("""INSERT INTO fs__users (email, password, real_name, birthday, phone_number, is_parent) values("%s", "%s", "%s", "%s", "%s","%s")""",
                   (email, password, real_name, birthday, phone_number, is_parent))
     return result
 
 
 def login(email, password):
-    result = query_handler("""SELECT email, password, real_name FROM fs__users WHERE email = %s AND password = %s LIMIT 1""", (email, password))
+    result = query_handler("""SELECT email, password, real_name FROM fs__users WHERE email ="%s" AND password ="%s" LIMIT 1""", (email, password))
     if result is None:
         return False, {}
     return True, result
 
 
 def add_question(email, question, sharing_data, is_private):
-    result = query_handler("""INSERT INTO fs__questions(question, email, is_private, sharing_data) VALUES(%s, %s, %s, %s)""",
+    result = query_handler("""INSERT INTO fs__questions(question, email, is_private, sharing_data) VALUES"%s","%s","%s","%s")""",
                          (question, email, is_private, sharing_data))
     return result
 
 
 def create_record(email, password, year, month, left_eye_degree, right_eye_degree):
-    result = query_handler("""SELECT id FROM fs__users WHERE email = %s AND password = %s LIMIT 1""", (email, password))
+    result = query_handler("""SELECT id FROM fs__users WHERE email ="%s" AND password ="%s" LIMIT 1""", (email, password))
     user_id = result['id']
     result_insert = query_handler("""INSERT INTO fs__data(right_eye_myopia, left_eye_myopia, year, month, user_id)
-    VALUES(%s, %s, %s, %s, %s)""", (right_eye_degree, left_eye_degree, year, month, user_id))
+    VALUES"%s","%s","%s","%s","%s")""", (right_eye_degree, left_eye_degree, year, month, user_id))
     return result_insert
 
 
 def get_user_records(email, password):
     result = query_handler("""SELECT fs__data.* FROM fs__data, fs__users 
-    WHERE fs__data.user_id = fs__users.id AND email = %s AND password = %s""", (email, password))
+    WHERE fs__data.user_id = fs__users.id AND email = "%s" AND password = "%s" """, (email, password))
     return result
 
 
 def get_user_doctors(email, password):
     doctors = query_handler("""SELECT doctors.email as email, doctors.id as doctor_id, doctors.phone_number as phone_number
     FROM fs__professionals as doctors, fs__users as users, fs__patient_doctor as patient_doctor
-    WHERE users.email = %s AND users.password = %s 
+    WHERE users.email ="%s" AND users.password ="%s" 
     AND patient_doctor.user_id = users.id AND patient_doctor.doctor_id = doctors.id""", (email, password))
     return doctors
 
