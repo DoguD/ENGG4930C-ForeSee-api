@@ -2,6 +2,7 @@ from chalice import Chalice
 from chalicelib import rds
 import random
 from urllib.parse import urlparse, parse_qs
+from utils import sqli_check
 
 app = Chalice(app_name='ForeSeeApi')
 
@@ -38,12 +39,12 @@ def parse_test():
 @app.route('/create_user', methods=['POST'], content_types=['application/json'], cors=True)
 def create_user():
     parsed = app.current_request.json_body
-    email = parsed['email']
-    password = parsed['password']
-    birthday = parsed['birthday']
-    real_name = parsed['real_name']
-    phone_number = parsed['phone_number']
-    is_parent = parsed['is_parent']
+    email = sqli_check(parsed['email'])
+    password = sqli_check(parsed['password'])
+    birthday = sqli_check(parsed['birthday'])
+    real_name = sqli_check(parsed['real_name'])
+    phone_number = sqli_check(parsed['phone_number'])
+    is_parent = sqli_check(parsed['is_parent'])
     user = rds.register_new_user(email, password, real_name, birthday, phone_number, is_parent)
     return {'status': 'OK', 'user': user}
 
@@ -51,8 +52,8 @@ def create_user():
 @app.route('/login', methods=['POST'], content_types=['application/json'], cors=True)
 def login():
     parsed = app.current_request.json_body
-    email = parsed['email']
-    password = parsed['password']
+    email = sqli_check(parsed['email'])
+    password = sqli_check(parsed['password'])
     status, user = rds.login(email, password)
     if not status:
         return {'status':'err'}
@@ -62,10 +63,10 @@ def login():
 @app.route('/add_question', methods=['POST'], content_types=['application/json'], cors=True)
 def add_question():
     parsed = app.current_request.json_body
-    email = parsed['email']
-    question = parsed['question']
-    sharing_data = parsed['sharing_data']
-    is_private = parsed['is_private']
+    email = sqli_check(parsed['email'])
+    question = sqli_check(parsed['question'])
+    sharing_data = sqli_check(parsed['sharing_data'])
+    is_private = sqli_check(parsed['is_private'])
     result = rds.add_question(email, question, sharing_data, is_private)
     return {'status': 'OK'}
 
@@ -73,12 +74,12 @@ def add_question():
 @app.route('/create_record', methods=['POST'], content_types=['application/json'], cors=True)
 def create_record():
     parsed = app.current_request.json_body
-    email = parsed['email']
-    password = parsed['password']
-    left_eye_degree = parsed['left_eye_degree']
-    right_eye_degree = parsed['right_eye_degree']
-    year = parsed['year']
-    month = parsed['month']
+    email = sqli_check(parsed['email'])
+    password = sqli_check(parsed['password'])
+    left_eye_degree = sqli_check(parsed['left_eye_degree'])
+    right_eye_degree = sqli_check(parsed['right_eye_degree'])
+    year = sqli_check(parsed['year'])
+    month = sqli_check(parsed['month'])
     result = rds.create_record(email, password, year, month, left_eye_degree, right_eye_degree)
     return {'status': 'OK', 'result': result}
 
